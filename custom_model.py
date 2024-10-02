@@ -6,10 +6,10 @@ model = YOLO("yolov8s_custom.pt")  # Load your custom trained model
 labels = ['alien','green rock','glacier','mushroom']
 
 # Load an image
-# image_path = "/home/andy/mysource/yolov8/alien_11.jpg"
-# image_path = "/home/andy/mysource/yolov8/glacier_694.jpg"
-image_path = "/home/andy/mysource/yolov8/mushroom_81.jpg"
-# image_path = "/home/andy/mysource/yolov8/greenrock_62.jpg"
+# image_path = "/home/andy/mysource/yolov8/test/alien_11.jpg"
+# image_path = "/home/andy/mysource/yolov8/test/glacier_694.jpg"
+image_path = "/home/andy/mysource/yolov8/test/mushroom_81.jpg"
+# image_path = "/home/andy/mysource/yolov8/test/greenrock_62.jpg"
 image = cv2.imread(image_path)
 
 # grey_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -18,7 +18,7 @@ image = cv2.imread(image_path)
 
 # Perform object detection on an image
 # results = model.predict(gray_3_channel, conf=0.8)
-results = model.predict(image, conf=0.2)
+results = model.predict(image, conf=0.4)
 print(f'result found: {len(results)}')
 # results[0].show()
 
