@@ -25,7 +25,6 @@ bridge = CvBridge()
 name_prefix = 'glacier'
 
 def image_callback(msg):
-    global count
     global name_prefix
     print("Received an image!")
     try:
@@ -36,7 +35,7 @@ def image_callback(msg):
     else:
         # Save your OpenCV2 image as a jpeg 
         img_name = f'{name_prefix}_{randint(1, 1000)}.jpg'
-        cv2.imwrite(f'images/{img_name}', cv2_img)
+        cv2.imwrite(img_name, cv2_img)
         
         print(f'image {img_name} is saved!')
         # Shutdown ros

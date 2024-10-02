@@ -3,13 +3,15 @@ import cv2
 
 # Load the trained YOLOv8 model
 model = YOLO("yolov8s_custom.pt")  # Load your custom trained model
-labels = ['alien','green rock','glacier','mushroom']
+labels = ['alien','green rock','glacier','mushroom','whitedot','stop']
 
 # Load an image
 # image_path = "/home/andy/mysource/yolov8/test/alien_11.jpg"
-# image_path = "/home/andy/mysource/yolov8/test/glacier_694.jpg"
-image_path = "/home/andy/mysource/yolov8/test/mushroom_81.jpg"
 # image_path = "/home/andy/mysource/yolov8/test/greenrock_62.jpg"
+image_path = "/home/andy/mysource/yolov8/test/glacier_694.jpg"
+# image_path = "/home/andy/mysource/yolov8/test/mushroom_81.jpg"
+# image_path = "/home/andy/mysource/yolov8/test/whitedot_196.jpg"
+# image_path = "/home/andy/mysource/yolov8/test/stop_483.jpg"
 image = cv2.imread(image_path)
 
 # grey_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -32,6 +34,9 @@ for result in results:
         label = box.cls.item()  # Convert Tensor to a standard Python type
         
         # Draw the bounding box
+        y_text = int(y1) - 10
+        if y_text <= 0:
+            y_text = 10
         cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
         cv2.putText(image, f"{labels[int(label)]} {confidence:.2f}", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
