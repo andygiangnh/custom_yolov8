@@ -23,6 +23,8 @@ import copy
 from threading import Lock
 from enum import Enum
 from ultralytics import YOLO
+import os
+from random import randint
 
 
 def wrap_angle(angle):
@@ -98,7 +100,7 @@ class CaveExplorer:
         self.computer_vision_model_ = YOLO(self.computer_vision_model_filename_)  # Load your custom trained model
 
         # Subscribe to the camera topic
-        self.image_sub_ = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_callback, queue_size=1)
+        self.image_sub_ = rospy.Subscriber("/camera/depth/image_raw", Image, self.image_callback, queue_size=1)
 
 
     def get_pose_2d(self):
@@ -134,7 +136,27 @@ class CaveExplorer:
         # Copy the image message to a cv image
         # see http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
         image = self.cv_bridge_.imgmsg_to_cv2(image_msg, desired_encoding='passthrough')
-        image = np.array(image, dtype=np.uint8)
+        # origin_image = np.array(image, dtype=np.uint8)
+        # Convert the single-channel image to a three-channel image
+        # origin_image = cv2.cvtColor(origin_image, cv2.COLOR_GRAY2RGB)
+
+        # Convert your ROS Image message to OpenCV2
+        # cv2_img = bridge.imgmsg_to_cv2(msg, "passthrough")
+
+        depth_array = np.array(image, dtype=np.float32)
+        cv2.normalize(depth_array, depth_array, 0, 1, cv2.NORM_MINMAX)
+        depth_array = (depth_array*255).astype(np.uint8)
+        depth_array = np.expand_dims(depth_array, axis=-1)
+        depth_array = np.repeat(depth_array, 3, axis=-1)
+
+        # filename = f'test{randint(1, 1000)}.jpg'
+        # cv2.imwrite(filename, depth_array)
+        # # Get the full path
+        # full_path = os.path.abspath(filename)
+        # print(f"The image is saved at: {full_path}")
+        # print(depth_array)
+        # print(f'size {(depth_array.shape)}')
+        
         # Create a grayscale version, since the simple model below uses this
         # image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         
@@ -156,7 +178,7 @@ class CaveExplorer:
         # "artifact_found_" doesn't need a mutex because it's an atomic
         
         # Perform object detection on an image
-        results = model.predict(image, conf=0.4)
+        results = model.predict(depth_array)
 
         # num_detections = len(detections)
         num_detections = len(results)
@@ -172,8 +194,8 @@ class CaveExplorer:
 
         
         # results[0].show()
-        labels = ['alien','green rock','glacier','mushroom']
-        threshold_vals = [0.8, 0.92, 0.4, 0.4]
+        labels = ['alien','glacier','mushroom','white sphere', 'green rock']
+        threshold_vals = [0.8, 0.92, 0.8, 0.8, 0.8]
         # Draw custom bounding boxes for objects with confidence > 80%
         for result in results:
             for box in result.boxes:
@@ -184,14 +206,16 @@ class CaveExplorer:
                 
                 # Draw the bounding box
                 if confidence > threshold_vals[index]:
-                    cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                    cv2.rectangle(depth_array, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
                     y_text = int(y1) - 10
                     if y_text >= 0:
-                        cv2.putText(image, f"{labels[index]} {confidence:.2f}", (int(x1), y_text), 
+                        cv2.putText(depth_array, f"{labels[index]} {confidence:.2f}", (int(x1), y_text), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         # Publish the image with the detection bounding boxes
-        image_detection_message = self.cv_bridge_.cv2_to_imgmsg(image, encoding="rgb8")
+        # cv_image_rgb_8u = cv2.convertScaleAbs(depth_array, alpha=(255.0/65535.0))
+
+        image_detection_message = self.cv_bridge_.cv2_to_imgmsg(depth_array, encoding="bgr8")
         self.image_detections_pub_.publish(image_detection_message)
 
         rospy.loginfo('image_callback')

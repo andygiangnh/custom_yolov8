@@ -3,16 +3,36 @@ import cv2
 
 # Load the trained YOLOv8 model
 model = YOLO("yolov8s_custom.pt")  # Load your custom trained model
-labels = ['alien','green rock','glacier','mushroom','whitedot','stop']
+labels = ['alien','glacier','mushroom','white sphere','green rock']
 
 # Load an image
 # image_path = "/home/andy/mysource/yolov8/test/alien_11.jpg"
 # image_path = "/home/andy/mysource/yolov8/test/greenrock_62.jpg"
-image_path = "/home/andy/mysource/yolov8/test/glacier_694.jpg"
+image_path = "/home/andy/mysource/yolov8/test/test381.jpg"
 # image_path = "/home/andy/mysource/yolov8/test/mushroom_81.jpg"
 # image_path = "/home/andy/mysource/yolov8/test/whitedot_196.jpg"
 # image_path = "/home/andy/mysource/yolov8/test/stop_483.jpg"
 image = cv2.imread(image_path)
+print(image)
+print(image.shape)
+
+# Split the image into its Blue, Green, and Red channels
+b, g, r = cv2.split(image)
+# Display the Blue channel
+cv2.imshow('Blue Channel', b)
+
+# Display the Green channel
+cv2.imshow('Green Channel', g)
+
+# Display the Red channel
+cv2.imshow('Red Channel', r)
+
+# Wait for a key press and close the windows
+cv2.waitKey(4000)
+cv2.destroyAllWindows()
+
+
+print(f'size {image.shape}')
 
 # grey_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # Replicate the grayscale image to have three channels

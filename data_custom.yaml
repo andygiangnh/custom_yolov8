@@ -1,6 +1,6 @@
 train: /home/andy/mysource/yolov8/train
 val: /home/andy/mysource/yolov8/val
 
-nc: 6
+nc: 5
 
-names: ["alien", "green rock", "glacier","mushroom", "whitedot", "stop"]
+names: ["alien", "glacier", "mushroom", "white sphere", "green rock"]

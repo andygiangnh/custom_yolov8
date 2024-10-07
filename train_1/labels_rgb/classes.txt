@@ -1,0 +1,6 @@
+alien
+green rock
+glacier
+mushroom
+whitedot
+stop
