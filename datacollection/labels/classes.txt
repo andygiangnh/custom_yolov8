@@ -1,0 +1,5 @@
+alien
+glacier
+mushroom
+white sphere
+green rock
